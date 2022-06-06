@@ -14,11 +14,16 @@ from .forms import SignUpForm
 from .models import Album, Song
 from .forms import NewAlbum, NewSong
 
+import logging
+
 ##########################################################
+
+logger = logging.getLogger(__name__)
 
 def home(request):
     #show all albums in chronological order of it's upload
     albums = Album.objects.all()
+    logger.info('Default page for user')
     return render(request, 'music_nation/home.html',{'albums':albums})
 
 #........................................................#
@@ -27,6 +32,7 @@ def profile_detail(request, username):
     # show all albums of the artist
     albums = get_object_or_404(User, username=username)
     albums = albums.albums.all()
+    logger.info(f'{username} locate in profile of "{User.username}"')
     return render(request, 'music_nation/artist_detail.html', {'albums':albums, 'username':username})
 
 #........................................................#
@@ -47,6 +53,7 @@ def add_album(request, username):
                     uploaded_on = timezone.now(),
                     album_artist = request.user
                 )
+                logger.info(f'{username} add new album "{album.album_name}"')
                 return redirect('music_nation:profile_detail', username=request.user)
         else:
             form = NewAlbum()
@@ -62,22 +69,26 @@ def album_detail(request,username, album):
     songs = get_object_or_404(User, username=username)
     songs = songs.albums.get(album_name=str(album))
     songs = songs.songs.all()
+    logger.info(f'{username} locate in album "{album}"')
     return render(request, 'music_nation/album_detail.html', {'songs':songs, 'album':album, 'username':username
     })
 
 #........................................................#
 
 def signup(request):
-
+    logger.warning('Current template_name: signup.html')
     if request.method == 'POST':
         form = SignUpForm(request.POST)
 
         if form.is_valid():
             user = form.save()
             login(request, user)
+            message = 'You successfully made registration'
+            logger.warning(message)
             return redirect('music_nation:home')
         else:
             message = 'Looks like a username with that email or password already exists'
+            logger.warning(message)
             return render(request, 'music_nation/signup.html', {'form':form,'message':message})
     else:
         form = SignUpForm()
@@ -96,6 +107,7 @@ def delete_album(request, username, album):
             song.delete_media()#deletes the song_file
         album_to_delete.delete_media()#deletes the album_logo
         album_to_delete.delete()#deletes the album from database
+        logger.info(f'{username} delete album "{album.album_name}"')
         return redirect('music_nation:profile_detail', username=username)
     else:
         return redirect('music_nation:profile_detail', username=username)
@@ -120,6 +132,7 @@ def add_song(request, username, album):
                     song_file = form.cleaned_data.get('song_file'),
                     song_album = album_get
                 )
+                logger.info(f'{username} add new song {song.song_name} in album "{album}"')
                 return redirect('music_nation:album_detail', username=username, album=album)
 
         else:

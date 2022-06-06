@@ -125,3 +125,37 @@ MEDIA_URL = '/media/'
 LOGIN_REDIRECT_URL = 'music_nation:home'
 LOGOUT_REDIRECT_URL = 'music_nation:home'
 LOGIN_URL = 'music_nation:login'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+            'level': 'DEBUG',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'log_journal.log',
+            'level': 'INFO',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'main': {
+            'level': 'INFO',
+            'handlers': ['file', 'console'],
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '{name} {levelname} {asctime} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+}
