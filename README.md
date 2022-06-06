@@ -1,1 +1,2 @@
-# ISP_Music_Streaming_Service
+# djangomusicplayer
+This is a music player made using Django and HTML5.
